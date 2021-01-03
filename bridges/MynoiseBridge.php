@@ -4,7 +4,7 @@ class MynoiseBridge extends BridgeAbstract {
 	const URI = 'https://mynoise.net';
 	const DESCRIPTION = 'Returns feeds for mynoise.net';
 	const MAINTAINER = 'Amatis-54';
-	const CACHE_TIMEOUT = 3600;
+	const CACHE_TIMEOUT = 43200;
 	const PARAMETERS = array( array(
 			'choice' => array(
 				'name' => 'Area',
