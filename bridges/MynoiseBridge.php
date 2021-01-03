@@ -30,8 +30,8 @@ public function collectData() {
 			$item['content'] = substr('Added ' . $element->plaintext,
 			0, strpos($element->innertext, '&bull') + 5);
 
-		$item['uri'] = $element->next_sibling()->href;
-		$this->items[] = $item; }
+			$item['uri'] = $element->next_sibling()->href;
+			$this->items[] = $item; }
 
 	} elseif ($this->getInput('choice') == 'blog') {
 		$html = getSimpleHTMLDOM('https://mynoise.net/blog.php')
