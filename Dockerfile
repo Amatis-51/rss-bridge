@@ -1,5 +1,9 @@
 FROM php:7-apache
 
+LABEL description="RSS-Bridge is a PHP project capable of generating RSS and Atom feeds for websites that don't have one."
+LABEL repository="https://github.com/RSS-Bridge/rss-bridge"
+LABEL website="https://github.com/RSS-Bridge/rss-bridge"
+
 ENV APACHE_DOCUMENT_ROOT=/app
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
@@ -16,3 +20,5 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
 	&& sed -ri -e 's/(CipherString\s*=\s*DEFAULT)@SECLEVEL=2/\1/' /etc/ssl/openssl.cnf
 
 COPY --chown=www-data:www-data ./ /app/
+
+CMD ["/app/docker-entrypoint.sh"]

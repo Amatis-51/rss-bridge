@@ -13,6 +13,11 @@ class TelegramBridge extends BridgeAbstract {
 			)
 		)
 	);
+	const TEST_DETECT_PARAMETERS = array(
+		'https://t.me/s/durov' => array('username' => 'durov'),
+		'https://t.me/durov' => array('username' => 'durov'),
+		'http://t.me/durov' => array('username' => 'durov'),
+	);
 
 	const CACHE_TIMEOUT = 900; // 15 mins
 
@@ -21,6 +26,18 @@ class TelegramBridge extends BridgeAbstract {
 	private $itemTitle = '';
 
 	private $backgroundImageRegex = "/background-image:url\('(.*)'\)/";
+	private $detectParamsRegex = '/^https?:\/\/t.me\/(?:s\/)?([\w]+)$/';
+
+	public function detectParameters($url) {
+		$params = array();
+
+		if(preg_match($this->detectParamsRegex, $url, $matches) > 0) {
+			$params['username'] = $matches[1];
+			return $params;
+		}
+
+		return null;
+	}
 
 	public function collectData() {
 
@@ -119,6 +136,12 @@ class TelegramBridge extends BridgeAbstract {
 			$this->itemTitle = $this->ellipsisTitle(
 				$messageDiv->find('div.tgme_widget_message_text.js-message_text', 0)->plaintext
 			);
+		}
+		if ($messageDiv->find('div.tgme_widget_message_document', 0)) {
+			$message .= 'Attachments:';
+			foreach ($messageDiv->find('div.tgme_widget_message_document') as $attachments) {
+				$message .= $attachments->find('div.tgme_widget_message_document_title.accent_color', 0);
+			}
 		}
 
 		if ($messageDiv->find('a.tgme_widget_message_link_preview', 0)) {
