@@ -23,7 +23,8 @@ class InternetArchiveBridge extends BridgeAbstract {
 					'Web Archives' => 'web-archive',
 				),
 				'defaultValue' => 'uploads',
-			)
+			),
+			'limit' => self::LIMIT,
 		)
 	);
 
@@ -65,15 +66,15 @@ class InternetArchiveBridge extends BridgeAbstract {
 
 	public function collectData() {
 
-		$html = getSimpleHTMLDOM($this->getURI())
-			or returnServerError('Could not request: ' . $this->getURI());
+		$html = getSimpleHTMLDOM($this->getURI());
 
 		$html = defaultLinkTo($html, $this->getURI());
 
 		if ($this->getInput('content') !== 'posts') {
 			$detailsDivNumber = 0;
 
-			foreach ($html->find('div.results > div[data-id]') as $index => $result) {
+			$results = $html->find('div.results > div[data-id]');
+			foreach ($results as $index => $result) {
 				$item = array();
 
 				if (in_array($result->class, $this->skipClasses)) {
@@ -111,6 +112,11 @@ class InternetArchiveBridge extends BridgeAbstract {
 				}
 
 				$detailsDivNumber++;
+
+				$limit = $this->getInput('limit') ?? 10;
+				if (count($this->items) >= $limit) {
+					break;
+				}
 			}
 		}
 
@@ -277,8 +283,7 @@ EOD;
 
 			$postDate = $tr->find('td', 4)->children(0)->plaintext;
 
-			$postPageHtml = getSimpleHTMLDOMCached($item['uri'], 3600)
-				or returnServerError('Could not request: ' . $item['uri']);
+			$postPageHtml = getSimpleHTMLDOMCached($item['uri'], 3600);
 
 			$postPageHtml = defaultLinkTo($postPageHtml, $this->getURI());
 
@@ -304,7 +309,7 @@ EOD;
 
 			$items[] = $item;
 
-			if (count($items) >= 10) {
+			if (count($items) >= $this->getInput('limit') ?? 10) {
 				break;
 			}
 		}
